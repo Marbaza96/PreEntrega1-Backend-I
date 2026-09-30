@@ -99,3 +99,38 @@ serviceManager.updateService(1, {
 ```js
 serviceManager.deleteService(1);
 ```
+----------------------------------------------------------------------------------------
+
+## API REST
+
+La aplicación expone endpoints REST para gestionar el recurso `services` mediante Express.
+
+### Obtener todos los servicios
+
+`GET /api/services`
+
+Devuelve todos los servicios disponibles. Permite filtrar por categoría y disponibilidad mediante query params.
+
+### Obtener un servicio por ID
+
+`GET /api/services/:id`
+
+Devuelve el servicio correspondiente al ID indicado. Responde con estado `200` si existe o `404` si no se encuentra.
+
+### Crear un servicio
+
+`POST /api/services`
+
+Crea un nuevo servicio utilizando los datos enviados en el body. El ID se genera automáticamente. Responde con estado `201` si se crea correctamente o `400` si faltan campos obligatorios.
+
+### Actualizar un servicio
+
+`PUT /api/services/:id`
+
+Actualiza los datos del servicio correspondiente al ID indicado. No permite modificar el ID. Responde con estado `200` si existe o `404` si no se encuentra.
+
+### Eliminar un servicio
+
+`DELETE /api/services/:id`
+
+Elimina el servicio correspondiente al ID indicado. Responde con estado `200` si se elimina correctamente o `404` si no se encuentra.

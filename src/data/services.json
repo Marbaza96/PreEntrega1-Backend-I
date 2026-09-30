@@ -1,2 +1,29 @@
-[]
-
+[
+  {
+    "id": 1,
+    "name": "Corte de cabello",
+    "description": "Corte de cabello personalizado",
+    "duration": 45,
+    "price": 900,
+    "category": "peluqueria",
+    "available": true
+  },
+  {
+    "id": 2,
+    "name": "Manicura",
+    "description": "Servicio de manicura completa",
+    "duration": 60,
+    "price": 1200,
+    "category": "estetica",
+    "available": true
+  },
+  {
+    "id": 3,
+    "name": "Coloración",
+    "description": "Servicio de coloración de cabello",
+    "duration": 120,
+    "price": 2500,
+    "category": "peluqueria",
+    "available": false
+  }
+]

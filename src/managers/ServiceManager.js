@@ -4,11 +4,14 @@ class ServiceManager {
     constructor() {
         this.path = "./src/data/services.json";
     }
+
+    // Obtener todos los servicios
     getServices() {
         const data = fs.readFileSync(this.path, "utf-8");
         return JSON.parse(data);
     }
 
+    // Obtener un servicio por ID
     getServiceById(id) {
         const services = this.getServices();
         const service = services.find((service) => service.id === id);
@@ -19,6 +22,7 @@ class ServiceManager {
         return service;
     }
 
+    // Agregar un nuevo servicio
     addService(serviceData) {
         const { name, description, duration, price, category, available } = serviceData;
 
@@ -55,6 +59,7 @@ class ServiceManager {
         return newService;
     }
 
+    // Actualizar un servicio existente
     updateService(id, updatedData) {
         const services = this.getServices();
         const index = services.findIndex((service) => service.id === id);
@@ -75,9 +80,10 @@ class ServiceManager {
         return services[index];
     }
 
+    // Eliminar un servicio por ID
     deleteService(id) {
         const services = this.getServices();
-        const serviceToDelete = this.getServiceById(id);
+        const serviceToDelete = services.find(service => service.id === id);
 
         if (!serviceToDelete) {
             return null;
