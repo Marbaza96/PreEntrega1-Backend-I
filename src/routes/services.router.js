@@ -8,19 +8,13 @@ const serviceManager = new ServiceManager();
 // Obtener todos los servicios con filtros opcionales
 router.get("/", (req, res) => {
     const { category, available } = req.query;
-    const availableBoolean = available === "true";
+    const availableBoolean = available !== undefined
+        ? available === "true"
+        : undefined;
 
-    const services = serviceManager.getServices();
+    const services = serviceManager.getServices(category, availableBoolean);
 
-    const filteredServices = category
-        ? services.filter((service) => service.category === category)
-        : services;
-
-    const availableServices = available !== undefined
-        ? filteredServices.filter((service) => service.available === availableBoolean)
-        : filteredServices;
-
-    res.status(200).json(availableServices);
+    res.status(200).json(services);
 });
 
 //Servicio por ID

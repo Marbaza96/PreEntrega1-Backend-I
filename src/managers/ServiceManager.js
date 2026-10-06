@@ -6,9 +6,19 @@ class ServiceManager {
     }
 
     // Obtener todos los servicios
-    getServices() {
+    getServices(category, available) {
         const data = fs.readFileSync(this.path, "utf-8");
-        return JSON.parse(data);
+        let services = JSON.parse(data);
+
+        if (category) {
+            services = services.filter((service) => service.category === category);
+        }
+
+        if (available !== undefined) {
+            services = services.filter((service) => service.available === available);
+        }
+
+        return services;
     }
 
     // Obtener un servicio por ID
