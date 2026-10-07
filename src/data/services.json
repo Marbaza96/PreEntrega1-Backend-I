@@ -4,7 +4,7 @@
     "name": "Corte de cabello",
     "description": "Corte de cabello personalizado",
     "duration": 45,
-    "price": 900,
+    "price": 950,
     "category": "peluqueria",
     "available": true
   },
@@ -25,5 +25,14 @@
     "price": 2500,
     "category": "peluqueria",
     "available": false
+  },
+  {
+    "id": 4,
+    "name": "Peinado",
+    "description": "Servicio de peinado",
+    "duration": 40,
+    "price": 1100,
+    "category": "peluqueria",
+    "available": true
   }
 ]

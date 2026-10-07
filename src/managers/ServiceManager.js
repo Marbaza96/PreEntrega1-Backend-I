@@ -1,29 +1,46 @@
-import fs from "fs";
+import fs from "fs/promises";
 
 class ServiceManager {
     constructor() {
         this.path = "./src/data/services.json";
     }
 
+    handleError(message, statusCode) {
+        const error = new Error(message);
+        error.statusCode = statusCode;
+        return error;
+    }
+
     // Obtener todos los servicios
-    getServices(category, available) {
-        const data = fs.readFileSync(this.path, "utf-8");
-        let services = JSON.parse(data);
+    async getServices(category, available) {
 
-        if (category) {
-            services = services.filter((service) => service.category === category);
+        try {
+            const data = await fs.readFile(this.path, "utf-8");
+            let services = JSON.parse(data);
+
+            if (category) {
+                services = services.filter((service) => service.category === category);
+            }
+
+            if (available !== undefined) {
+                services = services.filter((service) => service.available === available);
+            }
+            return services;
+
+        } catch (error) {
+
+            if (error.code === "ENOENT") {
+                await fs.writeFile(this.path, JSON.stringify([], null, 2));
+                return [];
+            }
+
+            throw error;
         }
-
-        if (available !== undefined) {
-            services = services.filter((service) => service.available === available);
-        }
-
-        return services;
     }
 
     // Obtener un servicio por ID
-    getServiceById(id) {
-        const services = this.getServices();
+    async getServiceById(id) {
+        const services = await this.getServices();
         const service = services.find((service) => service.id === id);
 
         if (!service) {
@@ -33,7 +50,7 @@ class ServiceManager {
     }
 
     // Agregar un nuevo servicio
-    addService(serviceData) {
+    async addService(serviceData) {
         const { name, description, duration, price, category, available } = serviceData;
 
         if (
@@ -44,10 +61,12 @@ class ServiceManager {
             !category ||
             available === undefined
         ) {
-            throw new Error("Todos los campos son obligatorios");
+            throw this.handleError("Todos los campos son obligatorios", 400);
         }
-        const services = this.getServices();
+
+        const services = await this.getServices();
         let newId = 1;
+
         if (services.length > 0) {
             const ids = services.map((service) => service.id);
             const maxId = Math.max(...ids);
@@ -65,15 +84,15 @@ class ServiceManager {
         };
 
         services.push(newService);
-        fs.writeFileSync(this.path, JSON.stringify(services, null, 2));
+        await fs.writeFile(this.path, JSON.stringify(services, null, 2));
         return newService;
     }
 
     // Actualizar un servicio existente
-    updateService(id, updatedData) {
-        const services = this.getServices();
+    async updateService(id, updatedData) {
+        const services = await this.getServices();
         const index = services.findIndex((service) => service.id === id);
-        
+
         if (index === -1) {
             return null;
         }
@@ -86,13 +105,13 @@ class ServiceManager {
             ...safeData
         };
 
-        fs.writeFileSync(this.path, JSON.stringify(services, null, 2));
+        await fs.writeFile(this.path, JSON.stringify(services, null, 2));
         return services[index];
     }
 
     // Eliminar un servicio por ID
-    deleteService(id) {
-        const services = this.getServices();
+    async deleteService(id) {
+        const services = await this.getServices();
         const serviceToDelete = services.find(service => service.id === id);
 
         if (!serviceToDelete) {
@@ -101,7 +120,7 @@ class ServiceManager {
 
         const updatedServices = services.filter(service => service.id !== id);
 
-        fs.writeFileSync(this.path, JSON.stringify(updatedServices, null, 2));
+        await fs.writeFile(this.path, JSON.stringify(updatedServices, null, 2));
         return serviceToDelete;
     }
 

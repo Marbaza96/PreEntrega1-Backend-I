@@ -6,51 +6,65 @@ const serviceManager = new ServiceManager();
 
 
 // Obtener todos los servicios con filtros opcionales
-router.get("/", (req, res) => {
-    const { category, available } = req.query;
-    const availableBoolean = available !== undefined
-        ? available === "true"
-        : undefined;
+router.get("/", async (req, res) => {
 
-    const services = serviceManager.getServices(category, availableBoolean);
+    try {
+        const { category, available } = req.query;
+        const availableBoolean = available !== undefined
+            ? available === "true"
+            : undefined;
 
-    res.status(200).json(services);
+        const services = await serviceManager.getServices(category, availableBoolean);
+
+        res.status(200).json(services);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
+
 //Servicio por ID
-router.get("/:id", (req, res) => {
-    const { id } = req.params;
-    const numericId = Number(id);
+router.get("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const numericId = Number(id);
 
-    const service = serviceManager.getServiceById(numericId);
+        const service = await serviceManager.getServiceById(numericId);
 
-    if (!service) {
-        return res.status(404).json({ error: "Servicio no encontrado" });
+        if (!service) {
+            return res.status(404).json({ error: "Servicio no encontrado" });
+        }
+
+        res.status(200).json(service);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-
-    res.status(200).json(service);
 });
 
 // Agregar un nuevo servicio
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
 
     try {
-        const createdService = serviceManager.addService(req.body);
+        const createdService = await serviceManager.addService(req.body);
         res.status(201).json(createdService);
     }
 
     catch (error) {
-        res.status(400).json({ error: error.message });
+        const statusCode = error.statusCode || 500;
+        res.status(statusCode).json({ error: error.message });
     }
-    
+
 });
 
 // Actualizar un servicio existente
-router.put("/:id", (req, res) => {
-    const { id } = req.params;
+router.put("/:id", async (req, res) => {
+
+    try {
+        const { id } = req.params;
     const numericId = Number(id);
 
-    const updatedService = serviceManager.updateService(numericId, req.body);
+    const updatedService = await serviceManager.updateService(numericId, req.body);
 
     if (!updatedService) {
         return res.status(404).json({ error: "Servicio no encontrado" });
@@ -58,20 +72,30 @@ router.put("/:id", (req, res) => {
 
     res.status(200).json(updatedService);
 
+    } catch (error) {
+        const statusCode = error.statusCode || 500;
+        res.status(statusCode).json({ error: error.message });
+    }    
 });
 
 // Eliminar un servicio por ID
-router.delete("/:id", (req, res) => {
-    const { id } = req.params;
+router.delete("/:id", async (req, res) => {
+
+    try {
+        const { id } = req.params;
     const numericId = Number(id);
 
-    const deletedService = serviceManager.deleteService(numericId);
+    const deletedService = await serviceManager.deleteService(numericId);
 
     if (!deletedService) {
         return res.status(404).json({ error: "Servicio no encontrado" });
     }
 
     res.status(200).json(deletedService);
+    } catch (error) {
+        const statusCode = error.statusCode || 500;
+        res.status(statusCode).json({ error: error.message });
+    }    
 });
 
 export default router;

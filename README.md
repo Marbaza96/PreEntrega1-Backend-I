@@ -1,11 +1,10 @@
+# API de Servicios y Reservas
 
-# Administrador de Servicios
-
-Proyecto desarrollado en Node.js para gestionar servicios de un sistema de turnos y reservas. Permite consultar, agregar, actualizar y eliminar servicios mediante una API REST desarrollada con Express.
+Proyecto desarrollado en Node.js para gestionar servicios y reservas de un sistema de turnos mediante una API REST con Express y persistencia de datos en archivos JSON utilizando FileSystem.
 
 ## Instalación
 
-Clonar el repositorio e instalar las dependencias con:
+Clonar el repositorio e instalar las dependencias:
 
 ```bash
 npm install
@@ -29,70 +28,75 @@ npm run dev
 
 Crear un archivo `.env` en la raíz del proyecto tomando como referencia `.env.example`.
 
-Las variables requeridas son:
-
 ```env
 PORT=8080
 NODE_ENV=development
 ```
 
-## Recurso Services
+## Recursos
 
-Cada servicio representa una prestación disponible dentro del sistema de turnos y reservas.
+### Services
 
 Cada servicio contiene las siguientes propiedades:
 
-- `id`: identificador único del servicio.
-- `name`: nombre del servicio.
-- `description`: descripción del servicio.
-- `duration`: duración del servicio.
-- `price`: precio del servicio.
-- `category`: categoría a la que pertenece.
-- `available`: indica si el servicio se encuentra disponible.
+- `id`
+- `name`
+- `description`
+- `duration`
+- `price`
+- `category`
+- `available`
 
-----------------------------------------------------------------------------------------
+### Bookings
+
+Cada reserva contiene las siguientes propiedades:
+
+- `id`
+- `clientName`
+- `clientEmail`
+- `date`
+- `time`
+- `status`
+- `services`
+
+Los servicios asociados a una reserva se almacenan mediante su ID y cantidad:
+
+```json
+{
+    "service": 1,
+    "quantity": 1
+}
+```
 
 ## API REST
 
-La aplicación expone endpoints REST para gestionar el recurso `services` mediante Express.
+### Services
 
-### Obtener todos los servicios
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/services` | Obtener todos los servicios |
+| GET | `/api/services/:id` | Obtener un servicio por ID |
+| POST | `/api/services` | Crear un servicio |
+| PUT | `/api/services/:id` | Actualizar un servicio |
+| DELETE | `/api/services/:id` | Eliminar un servicio |
 
-`GET /api/services`
+El listado de servicios permite filtrar mediante los query params `category` y `available`.
 
-Devuelve todos los servicios disponibles. Permite filtrar por categoría y disponibilidad mediante query params.
+### Ejemplos de peticiones HTTP
 
-Ejemplo:
+Obtener todos los servicios:
 
 ```http
 GET http://localhost:8080/api/services
 ```
 
-Ejemplo con filtros:
+Obtener servicios filtrados:
 
 ```http
 GET http://localhost:8080/api/services?category=peluqueria&available=true
 ```
 
-### Obtener un servicio por ID
-
-`GET /api/services/:id`
-
-Devuelve el servicio correspondiente al ID indicado. Responde con estado `200` si existe o `404` si no se encuentra.
-
-Ejemplo:
-
-```http
-GET http://localhost:8080/api/services/1
-```
-
-### Crear un servicio
-
-`POST /api/services`
-
-Crea un nuevo servicio utilizando los datos enviados en el body. El ID se genera automáticamente. Responde con estado `201` si se crea correctamente o `400` si faltan campos obligatorios.
-
-Ejemplo:
+Crear un servicio:
 
 ```http
 POST http://localhost:8080/api/services
@@ -108,32 +112,48 @@ Content-Type: application/json
 }
 ```
 
-### Actualizar un servicio
+### Bookings
 
-`PUT /api/services/:id`
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/bookings` | Obtener todas las reservas |
+| GET | `/api/bookings/:bid` | Obtener una reserva por ID |
+| POST | `/api/bookings` | Crear una reserva |
+| PUT | `/api/bookings/:id` | Actualizar una reserva |
+| POST | `/api/bookings/:bid/services/:sid` | Agregar un servicio a una reserva |
+| DELETE | `/api/bookings/:id` | Eliminar una reserva |
 
-Actualiza los datos del servicio correspondiente al ID indicado. No permite modificar el ID. Responde con estado `200` si existe o `404` si no se encuentra.
+### Ejemplos de peticiones HTTP
 
-Ejemplo:
+Obtener todas las reservas:
 
 ```http
-PUT http://localhost:8080/api/services/1
+GET http://localhost:8080/api/bookings
+```
+
+Crear una reserva:
+
+```http
+POST http://localhost:8080/api/bookings
 Content-Type: application/json
 
 {
-    "price": 1000,
-    "available": true
+    "clientName": "Cliente Prueba",
+    "clientEmail": "cliente@email.com",
+    "date": "2026-10-15",
+    "time": "10:00",
+    "status": "pendiente"
 }
 ```
 
-### Eliminar un servicio
-
-`DELETE /api/services/:id`
-
-Elimina el servicio correspondiente al ID indicado. Responde con estado `200` si se elimina correctamente o `404` si no se encuentra.
-
-Ejemplo:
+Obtener una reserva por ID:
 
 ```http
-DELETE http://localhost:8080/api/services/1
+GET http://localhost:8080/api/bookings/1
+```
+
+Agregar un servicio a una reserva:
+
+```http
+POST http://localhost:8080/api/bookings/1/services/1
 ```
